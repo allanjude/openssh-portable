@@ -1746,6 +1746,20 @@ main(int ac, char **av)
 	/* Fill in default values for those options not explicitly set. */
 	fill_default_server_options(&options);
 
+	if (options.none_enabled == 1) {
+		char *old_ciphers = options.ciphers;
+
+		xasprintf(&options.ciphers, "%s,none", old_ciphers);
+		free(old_ciphers);
+	}
+
+	if (options.nonemac_enabled == 1) {
+		char *old_macs = options.macs;
+
+		xasprintf(&options.macs, "%s,none", old_macs);
+		free(old_macs);
+	}
+
 	/* challenge-response is implemented via keyboard interactive */
 	if (options.challenge_response_authentication)
 		options.kbd_interactive_authentication = 1;
@@ -2371,6 +2385,11 @@ do_ssh2_kex(struct ssh *ssh)
 	char *myproposal[PROPOSAL_MAX] = { KEX_SERVER };
 	struct kex *kex;
 	int r;
+
+	if (options.none_enabled == 1)
+		debug("WARNING: None cipher enabled");
+	if (options.nonemac_enabled == 1)
+		debug("WARNING: None MAC enabled");
 
 	myproposal[PROPOSAL_KEX_ALGS] = compat_kex_proposal(
 	    options.kex_algorithms);
