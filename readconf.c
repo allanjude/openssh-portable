@@ -165,7 +165,7 @@ typedef enum {
 	oSendEnv, oControlPath, oControlMaster, oControlPersist,
 	oHashKnownHosts,
 	oTunnel, oTunnelDevice, oLocalCommand, oPermitLocalCommand,
-	oNoneEnabled, oNoneSwitch,
+	oNoneEnabled, oNoneMacEnabled, oNoneSwitch,
 	oDisableMTAES,
 	oTcpRcvBufPoll, oTcpRcvBuf, oHPNDisabled, oHPNBufferSize,
 	oVisualHostKey,
@@ -298,6 +298,7 @@ static struct {
 	{ "ipqos", oIPQoS },
 	{ "requesttty", oRequestTTY },
 	{ "noneenabled", oNoneEnabled },
+	{ "nonemacenabled", oNoneMacEnabled },
 	{ "noneswitch", oNoneSwitch },
 	{ "disablemtaes", oDisableMTAES },
 	{ "proxyusefdpass", oProxyUseFdpass },
@@ -999,6 +1000,10 @@ parse_time:
 
 	case oNoneEnabled:
 		intptr = &options->none_enabled;
+		goto parse_flag;
+
+	case oNoneMacEnabled:
+		intptr = &options->nonemac_enabled;
 		goto parse_flag;
 
 	case oDisableMTAES:
@@ -1921,6 +1926,7 @@ initialize_options(Options * options)
 	options->request_tty = -1;
 	options->none_switch = -1;
 	options->none_enabled = -1;
+	options->nonemac_enabled = -1;
 	options->disable_multithreaded = -1;
 	options->hpn_disabled = -1;
 	options->hpn_buffer_size = -1;
@@ -2093,6 +2099,8 @@ fill_default_options(Options * options)
 		options->none_switch = 0;
 	if (options->none_enabled == -1)
 		options->none_enabled = 0;
+	if (options->nonemac_enabled == -1)
+		options->nonemac_enabled = 0;
 	if (options->disable_multithreaded == -1)
 		options->disable_multithreaded = 0;
 	if (options->hpn_disabled == -1)

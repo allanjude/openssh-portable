@@ -430,6 +430,11 @@ ssh_userauth2(const char *local_user, const char *server_user, char *host,
 			memcpy(&myproposal, &myproposal_default, sizeof(myproposal));
 			myproposal[PROPOSAL_ENC_ALGS_STOC] = "none";
 			myproposal[PROPOSAL_ENC_ALGS_CTOS] = "none";
+			if (options.nonemac_enabled == 1) {
+				myproposal[PROPOSAL_MAC_ALGS_STOC] = "none";
+				myproposal[PROPOSAL_MAC_ALGS_CTOS] = "none";
+				fprintf(stderr, "WARNING: ENABLED NONE MAC\n");
+			}
 			kex_prop2buf(active_state->kex->my, myproposal);
 			packet_request_rekeying();
 			fprintf(stderr, "WARNING: ENABLED NONE CIPHER\n");
