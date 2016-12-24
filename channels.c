@@ -936,7 +936,7 @@ channel_pre_open(Channel *c, fd_set *readset, fd_set *writeset)
 	u_int limit = compat20 ? c->remote_window : packet_get_maxsize();
 
 	/* check buffer limits */
-	if (!c->tcpwinsz || c->dynamic_window > 0)
+	if (!c->tcpwinsz)
 		c->tcpwinsz = channel_tcpwinsz();
 
 	limit = MIN(limit, 2 * c->tcpwinsz);
@@ -1960,6 +1960,8 @@ channel_check_window(Channel *c)
 	    c->local_consumed > 0) {
 		u_int addition = 0;
 		/* adjust max window size if we are in a dynamic environment */
+		if (c->dynamic_window)
+			c->tcpwinsz = channel_tcpwinsz();
 		if (c->dynamic_window && (c->tcpwinsz > c->local_window)) {
 			/* grow the window somewhat aggressively to maintain pressure */
 			addition = 1.5 * (c->tcpwinsz - c->local_window);
