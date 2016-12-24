@@ -1960,9 +1960,9 @@ channel_check_window(Channel *c)
 	    c->local_consumed > 0) {
 		u_int addition = 0;
 		/* adjust max window size if we are in a dynamic environment */
-		if (c->dynamic_window && c->tcpwinsz > c->local_window_max) {
+		if (c->dynamic_window && (c->tcpwinsz > c->local_window)) {
 			/* grow the window somewhat aggressively to maintain pressure */
-			addition = 1.5 * (c->tcpwinsz - c->local_window_max);
+			addition = 1.5 * (c->tcpwinsz - c->local_window);
 			c->local_window_max += addition;
 		}
 		packet_start(SSH2_MSG_CHANNEL_WINDOW_ADJUST);
