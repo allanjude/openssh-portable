@@ -68,6 +68,7 @@ static const struct macalg macs[] = {
 	{ "hmac-ripemd160",			SSH_DIGEST, SSH_DIGEST_RIPEMD160, 0, 0, 0, 0 },
 	{ "hmac-ripemd160@openssh.com",		SSH_DIGEST, SSH_DIGEST_RIPEMD160, 0, 0, 0, 0 },
 #endif
+	{ "none",				SSH_DIGEST, SSH_DIGEST_NULL, 0, 0, 0, 0 },
 	{ "umac-64@openssh.com",		SSH_UMAC, 0, 0, 128, 64, 0 },
 	{ "umac-128@openssh.com",		SSH_UMAC128, 0, 0, 128, 128, 0 },
 

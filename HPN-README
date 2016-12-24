@@ -29,6 +29,12 @@ HPN-SSH home page describes this in greater detail.
 
 http://www.psc.edu/networking/projects/hpn-ssh
 
+NONE MAC:
+Even with the NONE cipher option, performance is still CPU bound by the speed
+of the MAC (Message Authentication Code). The NoneMacEnabled setting, which can
+only be used with *both* NoneEnabled and NoneSwitch set to yes, disables the
+MAC, which exposes your data to risk of modification in transit.
+
 BUFFER SIZES:
 
 If HPN is disabled the receive buffer size will be set to the

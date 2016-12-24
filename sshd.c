@@ -1606,6 +1606,13 @@ main(int ac, char **av)
 		free(old_ciphers);
 	}
 
+	if (options.nonemac_enabled == 1) {
+		char *old_macs = options.macs;
+
+		xasprintf(&options.macs, "%s,none", old_macs);
+		free(old_macs);
+	}
+
 	/* challenge-response is implemented via keyboard interactive */
 	if (options.challenge_response_authentication)
 		options.kbd_interactive_authentication = 1;
@@ -2194,6 +2201,8 @@ do_ssh2_kex(void)
 
 	if (options.none_enabled == 1)
 		debug("WARNING: None cipher enabled");
+	if (options.nonemac_enabled == 1)
+		debug("WARNING: None MAC enabled");
 
 	myproposal[PROPOSAL_KEX_ALGS] = compat_kex_proposal(
 	    options.kex_algorithms);

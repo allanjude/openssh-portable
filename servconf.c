@@ -161,6 +161,7 @@ initialize_server_options(ServerOptions *options)
 	options->authorized_principals_command = NULL;
 	options->authorized_principals_command_user = NULL;
 	options->none_enabled = -1;
+	options->nonemac_enabled = -1;
 	options->disable_multithreaded = -1,
 	options->tcp_rcv_buf_poll = -1;
 	options->hpn_disabled = -1;
@@ -331,6 +332,8 @@ fill_default_server_options(ServerOptions *options)
 		options->permit_tun = SSH_TUNMODE_NO;
 	if (options->none_enabled == -1)
 		options->none_enabled = 0;
+	if (options->nonemac_enabled == -1)
+		options->nonemac_enabled = 0;
 	if (options->disable_multithreaded == -1)
 		options->disable_multithreaded = 0;
 	if (options->hpn_disabled == -1)
@@ -444,7 +447,7 @@ typedef enum {
 	sPasswordAuthentication, sKbdInteractiveAuthentication,
 	sListenAddress, sAddressFamily,
 	sPrintMotd, sPrintLastLog, sIgnoreRhosts,
-	sNoneEnabled,
+	sNoneEnabled, sNoneMacEnabled,
 	sDisableMTAES,
 	sTcpRcvBufPoll, sHPNDisabled, sHPNBufferSize,
 	sX11Forwarding, sX11DisplayOffset, sX11UseLocalhost,
@@ -601,6 +604,7 @@ static struct {
 	{ "trustedusercakeys", sTrustedUserCAKeys, SSHCFG_ALL },
 	{ "authorizedprincipalsfile", sAuthorizedPrincipalsFile, SSHCFG_ALL },
 	{ "noneenabled", sNoneEnabled, SSHCFG_ALL },
+	{ "nonemacenabled", sNoneMacEnabled, SSHCFG_ALL },
 	{ "disableMTAES", sDisableMTAES, SSHCFG_ALL },
 	{ "hpndisabled", sHPNDisabled, SSHCFG_ALL },
 	{ "hpnbuffersize", sHPNBufferSize, SSHCFG_ALL },
@@ -1233,6 +1237,10 @@ process_server_config_line(ServerOptions *options, char *line,
 
 	case sNoneEnabled:
 		intptr = &options->none_enabled;
+		goto parse_flag;
+
+	case sNoneMacEnabled:
+		intptr = &options->nonemac_enabled;
 		goto parse_flag;
 
 	case sDisableMTAES:
