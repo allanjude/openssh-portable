@@ -198,7 +198,7 @@ struct Channel {
 #define CHAN_EOF_RCVD			0x08
 #define CHAN_LOCAL			0x10
 
-#define CHAN_RBUF	16*1024
+#define CHAN_RBUF			CHAN_SES_PACKET_DEFAULT
 
 /* check whether 'efd' is still in use */
 #define CHANNEL_EFD_INPUT_ACTIVE(c) \

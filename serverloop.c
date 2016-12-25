@@ -300,7 +300,7 @@ process_input(fd_set *readset, int connection_in)
 {
 	struct ssh *ssh = active_state; /* XXX */
 	int len;
-	char buf[16384];
+	char buf[SSH_IOBUFSZ];
 
 	/* Read and buffer any input data from the client. */
 	if (FD_ISSET(connection_in, readset)) {
