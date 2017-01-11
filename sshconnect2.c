@@ -424,12 +424,20 @@ ssh_userauth2(const char *local_user, const char *server_user, char *host,
 	 * and only if the right conditions are met -- both of the NONE commands
 	 * must be true and there must be no tty allocated.
 	 */
-	if ((options.none_switch == 1) && (options.none_enabled == 1)) {
+	if ((options.none_switch == 1) && (options.none_enabled == 1 || options.nonemac_enabled == 1)) {
 		if (!tty_flag) { /* no null on tty sessions */
 			debug("Requesting none rekeying...");
 			memcpy(&myproposal, &myproposal_default, sizeof(myproposal));
-			myproposal[PROPOSAL_ENC_ALGS_STOC] = "none";
-			myproposal[PROPOSAL_ENC_ALGS_CTOS] = "none";
+			if (options.none_enabled == 1) {
+				myproposal[PROPOSAL_ENC_ALGS_STOC] = "none";
+				myproposal[PROPOSAL_ENC_ALGS_CTOS] = "none";
+				fprintf(stderr, "WARNING: ENABLED NONE CIPHER\n");
+			} else {
+				myproposal[PROPOSAL_ENC_ALGS_STOC] =
+				    compat_cipher_proposal(options.ciphers);
+				myproposal[PROPOSAL_ENC_ALGS_CTOS] = 
+				    compat_cipher_proposal(options.ciphers);
+			}
 			if (options.nonemac_enabled == 1) {
 				myproposal[PROPOSAL_MAC_ALGS_STOC] = "none";
 				myproposal[PROPOSAL_MAC_ALGS_CTOS] = "none";
@@ -437,7 +445,6 @@ ssh_userauth2(const char *local_user, const char *server_user, char *host,
 			}
 			kex_prop2buf(active_state->kex->my, myproposal);
 			packet_request_rekeying();
-			fprintf(stderr, "WARNING: ENABLED NONE CIPHER\n");
 		} else {
 			/* requested NONE cipher when in a tty */
 			debug("Cannot switch to NONE cipher with tty allocated");
