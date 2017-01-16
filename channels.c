@@ -1965,6 +1965,13 @@ channel_check_window(Channel *c)
 		if (c->dynamic_window && (c->tcpwinsz > c->local_window)) {
 			/* grow the window somewhat aggressively to maintain pressure */
 			addition = 1.5 * (c->tcpwinsz - c->local_window);
+			/* Don't allow the window to grow beyond the maximum buffer size */
+			if (c->local_window_max*1.5 + addition > SSHBUF_SIZE_MAX) {
+				addition = 0;
+				/* If the maximum buffer size has been reached, disable polling */
+				c->dynamic_window = 0;
+			}
+
 			c->local_window_max += addition;
 		}
 		packet_start(SSH2_MSG_CHANNEL_WINDOW_ADJUST);
