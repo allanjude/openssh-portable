@@ -1922,18 +1922,37 @@ channel_check_window(Channel *c)
 {
 	if (c->type == SSH_CHANNEL_OPEN &&
 	    !(c->flags & (CHAN_CLOSE_SENT|CHAN_CLOSE_RCVD)) &&
-	    ((c->local_window_max - c->local_window >
+	    ((packet_is_interactive() &&
+	    c->local_window_max - c->local_window >
 	    c->local_maxpacket*3) ||
 	    c->local_window < c->local_window_max/2) &&
 	    c->local_consumed > 0) {
+		u_int additional = 0;
+		u_int32_t tcprcvwin = 0;
+		socklen_t optsz = sizeof(tcprcvwin);
+
+		if (!packet_is_interactive() &&
+		    packet_connection_is_on_socket() &&
+		    (getsockopt(packet_get_connection_in(), SOL_SOCKET,
+		    SO_RCVBUF, &tcprcvwin, &optsz)) == 0 &&
+		    tcprcvwin > c->local_window) {
+			/*
+			 * grow the SSH window aggressively to maintain
+			 * pressure on the TCP socket buffer, allowing the OS
+			 * auto-tuning to do the right thing
+			 */
+			additional = 2 * (tcprcvwin - c->local_window);
+			c->local_window_max += additional;
+		}
+
 		packet_start(SSH2_MSG_CHANNEL_WINDOW_ADJUST);
 		packet_put_int(c->remote_id);
-		packet_put_int(c->local_consumed);
+		packet_put_int(c->local_consumed + additional);
 		packet_send();
-		debug2("channel %d: window %d sent adjust %d",
+		debug2("channel %d: window %d sent adjust %d + additional %d",
 		    c->self, c->local_window,
-		    c->local_consumed);
-		c->local_window += c->local_consumed;
+		    c->local_consumed, additional);
+		c->local_window += c->local_consumed + additional;
 		c->local_consumed = 0;
 	}
 	return 1;
