@@ -4723,3 +4723,13 @@ auth_request_forwarding(void)
 	packet_send();
 	packet_write_wait();
 }
+
+void
+channel_set_remote_rcvbuf(u_int32_t remote_rcv_buf)
+{
+
+	debug("Requesting larger remote rcvbuf: %u", remote_rcv_buf);
+	packet_start(SSH2_MSG_LOCAL_SO_RCVBUF);
+	packet_put_int(remote_rcv_buf);
+	packet_send();
+}

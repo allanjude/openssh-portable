@@ -168,6 +168,7 @@ typedef enum {
 	oNoneEnabled, oNoneMacEnabled, oNoneSwitch,
 	oDisableMTAES,
 	oTcpRcvBufPoll, oTcpRcvBuf, oHPNDisabled, oHPNBufferSize,
+	oRemoteRcvBuf,
 	oVisualHostKey,
 	oKexAlgorithms, oIPQoS, oRequestTTY, oIgnoreUnknown, oProxyUseFdpass,
 	oCanonicalDomains, oCanonicalizeHostname, oCanonicalizeMaxDots,
@@ -321,6 +322,8 @@ static struct {
 	{ "tcprcvbuf", oTcpRcvBuf },
 	{ "hpndisabled", oHPNDisabled },
 	{ "hpnbuffersize", oHPNBufferSize },
+
+	{ "remotercvbuf", oRemoteRcvBuf },
 
 	{ NULL, oBadOption }
 };
@@ -1234,6 +1237,10 @@ parse_int:
 		intptr = &options->tcp_rcv_buf;
 		goto parse_int;
 
+	case oRemoteRcvBuf:
+		intptr = &options->remote_rcv_buf;
+		goto parse_int;
+
 	case oCipher:
 		intptr = &options->cipher;
 		arg = strdelim(&s);
@@ -1932,6 +1939,7 @@ initialize_options(Options * options)
 	options->hpn_buffer_size = -1;
 	options->tcp_rcv_buf_poll = -1;
 	options->tcp_rcv_buf = -1;
+	options->remote_rcv_buf = -1;
 	options->proxy_use_fdpass = -1;
 	options->ignored_unknown = NULL;
 	options->num_canonical_domains = 0;
@@ -2123,6 +2131,10 @@ fill_default_options(Options * options)
 		options->tcp_rcv_buf *=1024;
 	if (options->tcp_rcv_buf_poll == -1)
 		options->tcp_rcv_buf_poll = 1;
+	if (options->remote_rcv_buf == 0)
+		options->remote_rcv_buf = 1;
+	if (options->remote_rcv_buf > -1)
+		options->remote_rcv_buf *=1024;
 	if (options->control_master == -1)
 		options->control_master = 0;
 	if (options->control_persist == -1) {

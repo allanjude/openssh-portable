@@ -325,4 +325,6 @@ void	 chan_obuf_empty(Channel *);
 /* hpn handler */
 void     channel_set_hpn(int, int);
 
+void	 channel_set_remote_rcvbuf(u_int32_t);
+
 #endif

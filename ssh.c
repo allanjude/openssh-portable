@@ -2102,6 +2102,10 @@ ssh_session2(void)
 		packet_send();
 	}
 
+	/* If set, request a larger remote TCP recv window */
+	if (options.remote_rcv_buf > 0)
+		channel_set_remote_rcvbuf(options.remote_rcv_buf);
+
 	/* Execute a local command */
 	if (options.local_command != NULL &&
 	    options.permit_local_command)
