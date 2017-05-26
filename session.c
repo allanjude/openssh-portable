@@ -2265,7 +2265,14 @@ session_set_fds(struct ssh *ssh, Session *s,
 	channel_set_fds(ssh, s->chanid,
 	    fdout, fdin, fderr,
 	    ignore_fderr ? CHAN_EXTENDED_IGNORE : CHAN_EXTENDED_READ,
-	    1, is_tty, CHAN_SES_WINDOW_DEFAULT);
+	    1, is_tty,
+	    options.hpn_disabled ? CHAN_SES_WINDOW_DEFAULT : options.hpn_buffer_size);
+
+	/* If set, request a larger remote TCP recv window */
+/*
+	if (options.remote_rcv_buf > 0)
+		channel_set_remote_rcvbuf(s->chanid, options.remote_rcv_buf);
+*/
 }
 
 /*

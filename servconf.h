@@ -202,6 +202,10 @@ typedef struct {
 	int	none_enabled;		/* Enable NONE cipher switch */
 	int	nonemac_enabled;	/* Enable NONE MAC switch */
 
+	int     disable_multithreaded;  /*disable multithreaded aes-ctr cipher */
+
+	int	max_rcv_buf;		/* maximum size of TCP SO_RCVBUF */
+	
 	int	permit_tun;
 
 	char   **permitted_opens;	/* May also be one of PERMITOPEN_* */

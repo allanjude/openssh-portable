@@ -191,6 +191,7 @@ initialize_server_options(ServerOptions *options)
 	options->tcp_rcv_buf_poll = -1;
 	options->hpn_disabled = -1;
 	options->hpn_buffer_size = -1;
+	options->max_rcv_buf = -1;
 	options->ip_qos_interactive = -1;
 	options->ip_qos_bulk = -1;
 	options->version_addendum = NULL;
@@ -486,6 +487,9 @@ fill_default_server_options(ServerOptions *options)
 			options->hpn_buffer_size = CHAN_TCP_WINDOW_DEFAULT;
 	}
 
+	if (options->max_rcv_buf == -1)
+		options->max_rcv_buf = SSHBUF_SIZE_MAX;
+
 	if (options->ip_qos_interactive == -1)
 		options->ip_qos_interactive = IPTOS_DSCP_AF21;
 	if (options->ip_qos_bulk == -1)
@@ -561,6 +565,7 @@ typedef enum {
 	sNoneEnabled, sNoneMacEnabled,
 	sDisableMTAES,
 	sTcpRcvBufPoll, sHPNDisabled, sHPNBufferSize,
+	sMaxRcvBuf,
 	sX11Forwarding, sX11DisplayOffset, sX11UseLocalhost,
 	sPermitTTY, sStrictModes, sEmptyPasswd, sTCPKeepAlive,
 	sPermitUserEnvironment, sAllowTcpForwarding, sCompression,
@@ -726,6 +731,7 @@ static struct {
 	{ "hpndisabled", sHPNDisabled, SSHCFG_ALL },
 	{ "hpnbuffersize", sHPNBufferSize, SSHCFG_ALL },
 	{ "tcprcvbufpoll", sTcpRcvBufPoll, SSHCFG_ALL },
+	{ "maxrcvbuf", sMaxRcvBuf, SSHCFG_ALL },
 	{ "kexalgorithms", sKexAlgorithms, SSHCFG_GLOBAL },
 	{ "include", sInclude, SSHCFG_ALL },
 	{ "ipqos", sIPQoS, SSHCFG_ALL },
@@ -1537,6 +1543,10 @@ process_server_config_line_depth(ServerOptions *options, char *line,
 
 	case sDisableMTAES:
 		intptr = &options->disable_multithreaded;
+		goto parse_flag;
+
+	case sMaxRcvBuf:
+		intptr = &options->max_rcv_buf;
 		goto parse_flag;
 
 	case sIgnoreUserKnownHosts:

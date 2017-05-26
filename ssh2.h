@@ -141,6 +141,10 @@
 #define SSH2_MSG_CHANNEL_SUCCESS			99
 #define SSH2_MSG_CHANNEL_FAILURE			100
 
+/* Local Extensions */
+
+#define SSH2_MSG_LOCAL_SO_RCVBUF			192
+
 /* disconnect reason code */
 
 #define SSH2_DISCONNECT_HOST_NOT_ALLOWED_TO_CONNECT	1
