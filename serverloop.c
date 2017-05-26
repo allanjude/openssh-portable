@@ -892,4 +892,34 @@ server_init_dispatch(void)
 	dispatch_set(SSH2_MSG_REQUEST_FAILURE, &server_input_keep_alive);
 	/* rekeying */
 	dispatch_set(SSH2_MSG_KEXINIT, &kex_input_kexinit);
+
+	/* Local Extensions */
+	dispatch_set(SSH2_MSG_LOCAL_SO_RCVBUF, &server_set_rcvbuf);
+}
+
+/* The client has requested we set our receive buffer */
+int
+server_set_rcvbuf(int type, u_int32_t seq, void *ctxt)
+{
+	u_int32_t req_rcvbuf, rcvbuf;
+	socklen_t optsz = sizeof(req_rcvbuf);
+
+	if (!compat20)
+		return 0;
+
+	req_rcvbuf = packet_get_int();
+	packet_check_eom();
+	if (req_rcvbuf > options.max_rcv_buf)
+		req_rcvbuf = options.max_rcv_buf;
+	debug("client requesting recv sockbuf of %u", req_rcvbuf);
+	setsockopt(packet_get_connection_in(), SOL_SOCKET, SO_RCVBUF,
+	    &req_rcvbuf, optsz);
+	getsockopt(packet_get_connection_in(), SOL_SOCKET, SO_RCVBUF,
+	    &rcvbuf, &optsz);
+	debug("set recv sockbuf to %u", rcvbuf);
+
+	if (rcvbuf != req_rcvbuf)
+		return 1;
+
+	return 0;
 }

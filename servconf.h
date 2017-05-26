@@ -173,6 +173,8 @@ typedef struct {
 	int	none_enabled;		/* Enable NONE cipher switch */
 
 	int     disable_multithreaded;  /*disable multithreaded aes-ctr cipher */
+
+	int	max_rcv_buf;		/* maximum size of TCP SO_RCVBUF */
 	
 	int	permit_tun;
 
